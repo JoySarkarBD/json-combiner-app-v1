@@ -8,15 +8,19 @@ import FileInput from "./components/FileInput/FileInput";
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
+  const [isConverting, setIsConverting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const formRef = useRef(null); // Create a ref for the form element
 
-  const handleFileUpload = useCallback(files => {
+  const handleFileUpload = useCallback((files) => {
+    setErrorMessage("");
     setUploadedFiles(Array.from(files)); // Convert the FileList to an array
   }, []);
 
   const handleConvert = useCallback(
-    async event => {
+    async (event) => {
       event.preventDefault(); // Prevent form submission
+      setIsConverting(true); // Start the loading state
       const combined = [];
       const readerPromises = [];
       const batchSize = 10; // Number of files to process in one batch
@@ -25,17 +29,24 @@ function App() {
         const batch = uploadedFiles.slice(i, i + batchSize);
         const batchReaderPromises = [];
 
-        batch.forEach(file => {
+        batch.forEach((file) => {
           const reader = new FileReader();
-          const promise = new Promise(resolve => {
-            reader.onload = event => {
-              const data = JSON.parse(event.target.result);
+          const promise = new Promise((resolve) => {
+            reader.onload = (event) => {
+              try {
+                const data = JSON.parse(event.target.result);
 
-              if (Array.isArray(data)) {
-                combined.push(...data);
-              } else {
-                const dataArray = Array.isArray(data) ? data : [data];
-                combined.push(...dataArray);
+                if (Array.isArray(data)) {
+                  combined.push(...data);
+                } else {
+                  const dataArray = Array.isArray(data) ? data : [data];
+                  combined.push(...dataArray);
+                }
+              } catch (error) {
+                // Handle parsing error
+                console.error("Error parsing JSON:", error);
+                setErrorMessage("Invalid JSON format"); // Set the error message
+                formRef.current.reset(); // Reset the form
               }
 
               resolve();
@@ -50,6 +61,7 @@ function App() {
       }
 
       setCombinedData(combined);
+      setIsConverting(false); // End the loading state
     },
     [uploadedFiles]
   );
@@ -79,14 +91,37 @@ function App() {
         interchange, our tool empowers you to effortlessly convert, manipulate,
         and visualize JSON data <br /> with unparalleled ease.
       </p>
+      {/* Form */}
       <form
         ref={formRef}
         onSubmit={handleDownload}
         className='form-container mx-auto mt-5'>
         <div className='upload-files-container'>
-          {/* Attach onSubmit handler */}
+          {/* File Input Filed */}
           <FileInput onFileUpload={handleFileUpload} />
+          {errorMessage === "" ? (
+            ""
+          ) : (
+            <div
+              className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-center mt-2'
+              role='alert'>
+              <strong className='font-bold'>Holy smokes!</strong>
+              <br />
+              <span className='block sm:inline'>{errorMessage}</span>
+            </div>
+          )}
+          {/* Loading...... */}
+          {isConverting && (
+            <div className='text-center mt-2'>
+              <div className=' flex justify-center items-center'>
+                <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900'></div>
+              </div>
+            </div>
+          )}
+          {/* Convert Button */}
           <ConvertButton onConvert={handleConvert} />
+
+          {/* Download Button */}
           {combinedData.length > 0 && (
             <DownloadButton
               jsonData={combinedData}

@@ -1,5 +1,4 @@
-import React from "react";
-
+// Inside the DownloadButton component
 function DownloadButton({ jsonData, onDownload }) {
   const downloadJsonFile = () => {
     const blob = new Blob([JSON.stringify(jsonData)], {

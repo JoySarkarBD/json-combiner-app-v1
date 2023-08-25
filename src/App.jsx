@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useCallback, useState } from "react";
 import ConvertButton from "./components/ConvertButton/ConvertButton";
 import DownloadButton from "./components/DownloadButton/DownloadButton";
 import FileInput from "./components/FileInput/FileInput";
@@ -7,45 +7,50 @@ function App() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
 
-  const handleFileUpload = (files) => {
+  const handleFileUpload = useCallback((files) => {
     setUploadedFiles(Array.from(files)); // Convert the FileList to an array
-  };
+  }, []);
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(async () => {
     const combined = [];
     const readerPromises = [];
+    const batchSize = 10; // Number of files to process in one batch
 
-    uploadedFiles.forEach((file) => {
-      const reader = new FileReader();
-      const promise = new Promise((resolve) => {
-        reader.onload = (event) => {
-          const data = JSON.parse(event.target.result);
+    for (let i = 0; i < uploadedFiles.length; i += batchSize) {
+      const batch = uploadedFiles.slice(i, i + batchSize);
+      const batchReaderPromises = [];
 
-          if (Array.isArray(data)) {
-            combined.push(...data);
-          } else {
-            // If data is not an array, convert it to an array
-            const dataArray = Array.isArray(data) ? data : [data];
-            combined.push(...dataArray);
-          }
+      batch.forEach((file) => {
+        const reader = new FileReader();
+        const promise = new Promise((resolve) => {
+          reader.onload = (event) => {
+            const data = JSON.parse(event.target.result);
 
-          resolve();
-        };
+            if (Array.isArray(data)) {
+              combined.push(...data);
+            } else {
+              const dataArray = Array.isArray(data) ? data : [data];
+              combined.push(...dataArray);
+            }
+
+            resolve();
+          };
+        });
+
+        reader.readAsText(file);
+        batchReaderPromises.push(promise);
       });
 
-      reader.readAsText(file);
-      readerPromises.push(promise);
-    });
+      await Promise.all(batchReaderPromises);
+    }
 
-    Promise.all(readerPromises).then(() => {
-      setCombinedData(combined);
-    });
-  };
+    setCombinedData(combined);
+  }, [uploadedFiles]);
 
-  const handleDownload = () => {
-    setUploadedFiles([]); // Reset uploadedFiles state
-    setCombinedData([]); // Reset combinedData state
-  };
+  const handleDownload = useCallback(() => {
+    setUploadedFiles([]);
+    setCombinedData([]);
+  }, []);
 
   return (
     <div className='container mx-auto p-4'>

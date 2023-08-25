@@ -7,7 +7,13 @@ function FileInput({ onFileUpload }) {
   };
 
   return (
-    <input type='file' accept='.json' multiple onChange={handleFileChange} />
+    <input
+      className='border p-2 rounded'
+      type='file'
+      accept='.json'
+      multiple
+      onChange={handleFileChange}
+    />
   );
 }
 

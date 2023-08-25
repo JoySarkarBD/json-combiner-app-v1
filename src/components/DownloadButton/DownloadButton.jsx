@@ -1,6 +1,6 @@
 import React from "react";
 
-function DownloadButton({ jsonData }) {
+function DownloadButton({ jsonData, onDownload }) {
   const downloadJsonFile = () => {
     const blob = new Blob([JSON.stringify(jsonData)], {
       type: "application/json",
@@ -10,9 +10,16 @@ function DownloadButton({ jsonData }) {
     a.href = url;
     a.download = "combined.json";
     a.click();
+    onDownload(); // Call the onDownload callback after downloading
   };
 
-  return <button onClick={downloadJsonFile}>Download Combined JSON</button>;
+  return (
+    <button
+      className='bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600'
+      onClick={downloadJsonFile}>
+      Download Combined JSON
+    </button>
+  );
 }
 
 export default DownloadButton;

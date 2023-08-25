@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ConvertButton from "./components/ConvertButton/ConvertButton";
 import DownloadButton from "./components/DownloadButton/DownloadButton";
 import FileInput from "./components/FileInput/FileInput";
@@ -11,8 +11,6 @@ function App() {
     setUploadedFiles(Array.from(files)); // Convert the FileList to an array
   };
 
-  console.log(uploadedFiles);
-
   const handleConvert = () => {
     const combined = [];
     const readerPromises = [];
@@ -22,7 +20,15 @@ function App() {
       const promise = new Promise((resolve) => {
         reader.onload = (event) => {
           const data = JSON.parse(event.target.result);
-          combined.push(...data);
+
+          if (Array.isArray(data)) {
+            combined.push(...data);
+          } else {
+            // If data is not an array, convert it to an array
+            const dataArray = Array.isArray(data) ? data : [data];
+            combined.push(...dataArray);
+          }
+
           resolve();
         };
       });
@@ -36,12 +42,19 @@ function App() {
     });
   };
 
+  const handleDownload = () => {
+    setUploadedFiles([]); // Reset uploadedFiles state
+    setCombinedData([]); // Reset combinedData state
+  };
+
   return (
-    <div>
-      <h1>JSON Converter App</h1>
+    <div className='container mx-auto p-4'>
+      <h1 className='text-2xl font-bold mb-4'>JSON Converter App</h1>
       <FileInput onFileUpload={handleFileUpload} />
       <ConvertButton onConvert={handleConvert} />
-      {combinedData.length > 0 && <DownloadButton jsonData={combinedData} />}
+      {combinedData.length > 0 && (
+        <DownloadButton jsonData={combinedData} onDownload={handleDownload} />
+      )}
     </div>
   );
 }

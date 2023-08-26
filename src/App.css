@@ -5,11 +5,12 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: "Montserrat", sans-serif;
+  background: #2c2c54;
 }
 .form-container {
   width: 60vw;
   height: 50vh;
-  background-color: #57606f;
+  background-color: #2c3e50;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -68,11 +68,11 @@ function App() {
 
   return (
     <div className='container mx-auto p-4'>
-      <h1 className='text-3xl font-bold mb-4 text-center mt-9'>
+      <h1 className='text-3xl font-bold mb-4 text-center mt-9 text-white'>
         JSON Converter App
       </h1>
 
-      <p className='mt-4 mb-5 text-lg font-normal text-center text-gray-500'>
+      <p className='mt-4 mb-5 text-lg font-normal text-center text-gray-200'>
         Introducing our cutting-edge JSON Converter Web App – your ultimate
         solution for seamless <br /> data transformation! Whether you are a
         developer, data analyst, or simply someone dealing with data <br />

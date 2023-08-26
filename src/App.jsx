@@ -8,7 +8,6 @@ import FileInput from "./components/FileInput/FileInput";
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
-  const [isConverting, setIsConverting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const formRef = useRef(null); // Create a ref for the form element
 
@@ -20,7 +19,6 @@ function App() {
   const handleConvert = useCallback(
     async (event) => {
       event.preventDefault(); // Prevent form submission
-      setIsConverting(true); // Start the loading state
       const combined = [];
       const readerPromises = [];
       const batchSize = 10; // Number of files to process in one batch
@@ -46,7 +44,11 @@ function App() {
                 // Handle parsing error
                 console.error("Error parsing JSON:", error);
                 setErrorMessage("Invalid JSON format"); // Set the error message
+                setUploadedFiles([]); // Clear uploaded files
+                setCombinedData([]); // Clear combined data
                 formRef.current.reset(); // Reset the form
+
+                return;
               }
 
               resolve();
@@ -61,7 +63,6 @@ function App() {
       }
 
       setCombinedData(combined);
-      setIsConverting(false); // End the loading state
     },
     [uploadedFiles]
   );
@@ -77,6 +78,8 @@ function App() {
     setUploadedFiles([]); // Clear uploaded files
     setCombinedData([]); // Clear combined data
   };
+
+  console.log(combinedData);
 
   return (
     <div className='container mx-auto p-4'>
@@ -110,19 +113,11 @@ function App() {
               <span className='block sm:inline'>{errorMessage}</span>
             </div>
           )}
-          {/* Loading...... */}
-          {isConverting && (
-            <div className='text-center mt-2'>
-              <div className=' flex justify-center items-center'>
-                <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900'></div>
-              </div>
-            </div>
-          )}
           {/* Convert Button */}
           <ConvertButton onConvert={handleConvert} />
 
           {/* Download Button */}
-          {combinedData.length > 0 && (
+          {errorMessage === "" && combinedData.length > 0 && (
             <DownloadButton
               jsonData={combinedData}
               onDownload={handleFormReset}

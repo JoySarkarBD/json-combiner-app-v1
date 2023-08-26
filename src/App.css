@@ -25,7 +25,7 @@ body {
   justify-content: center;
   flex-direction: column;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 20px, rgba(0, 0, 0, 0.28) 0px 6px 6px;
-  height: 255px;
+  height: 355px;
 }
 .drag-file-area {
   border: 2px dashed #7b2cbf;

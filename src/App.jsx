@@ -11,13 +11,13 @@ function App() {
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const formRef = useRef(null); // Create a ref for the form element
 
-  const handleFileUpload = useCallback((files) => {
+  const handleFileUpload = useCallback(files => {
     setErrorMessage("");
     setUploadedFiles(Array.from(files)); // Convert the FileList to an array
   }, []);
 
   const handleConvert = useCallback(
-    async (event) => {
+    async event => {
       event.preventDefault(); // Prevent form submission
       const combined = [];
       const readerPromises = [];
@@ -27,10 +27,10 @@ function App() {
         const batch = uploadedFiles.slice(i, i + batchSize);
         const batchReaderPromises = [];
 
-        batch.forEach((file) => {
+        batch.forEach(file => {
           const reader = new FileReader();
-          const promise = new Promise((resolve) => {
-            reader.onload = (event) => {
+          const promise = new Promise(resolve => {
+            reader.onload = event => {
               try {
                 const data = JSON.parse(event.target.result);
 
@@ -84,21 +84,20 @@ function App() {
   return (
     <div className='container mx-auto p-4'>
       <h1 className='text-3xl font-bold mb-4 text-center mt-9 text-white'>
-        JSON Converter App
+        JSON Combiner App
       </h1>
 
       <p className='mt-4 mb-5 text-lg font-normal text-center text-gray-200'>
-        Introducing our cutting-edge JSON Converter Web App – your ultimate
-        solution for seamless <br /> data transformation! Whether you are a
-        developer, data analyst, or simply someone dealing with data <br />
-        interchange, our tool empowers you to effortlessly convert, manipulate,
-        and visualize JSON data <br /> with unparalleled ease.
+        Welcome to the JSON Combiner App! Simplify and streamline your <br />{" "}
+        JSON data management with our powerful tool. Whether you are a <br />
+        developer, data analyst, or simply dealing with JSON files, our app{" "}
+        <br /> is designed to make your life easier.
       </p>
       {/* Form */}
       <form
         ref={formRef}
         onSubmit={handleDownload}
-        className='form-container mx-auto mt-5'>
+        className='form-container mx-auto mt-12'>
         <div className='upload-files-container'>
           {/* File Input Filed */}
           <FileInput onFileUpload={handleFileUpload} />
